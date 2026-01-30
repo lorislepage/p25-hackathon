@@ -179,3 +179,13 @@ class Grid:
         if ch == "#":
             return f"\x1b[32m{ch}\x1b[0m"
         return ch
+
+def main() -> None:
+    print("Testing Grid...")
+    g = Grid(size=10, grass_regrow_time=5)
+    g.place_grass_random(0.5, random.Random(42))
+    print(g.render_ascii(use_color=True))
+    print("Grid test complete.")
+
+if __name__ == "__main__":
+    main()
