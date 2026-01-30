@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-
 @dataclass
 class Animal:
-    """Classe de base pour les animaux.
+    """
+    Classe de base pour les animaux.
     La position est gérée par la grille (Grid), ici on garde seulement l'état.
     """
     energy: int
@@ -15,23 +15,20 @@ class Animal:
     def lose_energy(self, amount: int) -> None:
         self.energy -= amount
 
-
 @dataclass
 class Sheep(Animal):
     """Mouton."""
     pass
-
 
 @dataclass
 class Wolf(Animal):
     """Loup."""
     pass
 
-
 @dataclass
 class GrassCell:
-    """État de l'herbe pour une cellule.
-
+    """
+    État de l'herbe pour une cellule.
     present : herbe disponible
     regrow_timer : si l'herbe a été mangée, compteur avant repousse
     """
