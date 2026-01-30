@@ -1,13 +1,8 @@
-import logging
 import random
 from dataclasses import dataclass
 
-from ecosystem.livingbeings import Sheep, Wolf
-from ecosystem.grid import Grid
-
-
-LOGGER = logging.getLogger(_name_)
-
+from p25_hackathon.livingbeings import Sheep, Wolf
+from p25_hackathon.grid import Grid
 
 @dataclass(frozen=True)
 class SimConfig:
@@ -38,7 +33,6 @@ class SimConfig:
     max_turns: int = 500
     delay_s: float = 0.05
     use_color: bool = True
-
 
 class Simulation:
     """Orchestre les tours.
@@ -75,7 +69,6 @@ class Simulation:
                 break
 
         s, w, g = self._grid.count()
-        LOGGER.info("Initialized: sheep=%s wolves=%s grass=%s", s, w, g)
 
     def step(self) -> None:
         """Exécute un tour complet."""
