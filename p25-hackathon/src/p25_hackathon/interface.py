@@ -1,5 +1,5 @@
 import pyxel
-from typing import Optional
+from typing import Optional, Any
 
 from p25_hackathon.simulation import SimConfig, Simulation
 
@@ -17,16 +17,27 @@ class PyxelApp:
         # Convert delay (seconds) to frames. Ensure at least 1 frame wait.
         self.update_interval = max(1, int(fps * cfg.delay_s))
 
+        self.stats = {
+            "turns": [],
+            "sheep": [],
+            "wolves": [],
+            "grass": []
+        }
 
         self.sim = Simulation(cfg, seed=seed)
         self.sim.initialize()
+        
+        # We record initial state
+        self._record_stats()
 
-        w = cfg.grid_size * cell_px
-        h = cfg.grid_size * cell_px + self.hud_h
-
+    def start(self) -> None:
+        w = self.cfg.grid_size * self.cell_px
+        h = self.cfg.grid_size * self.cell_px + self.hud_h
+        
         # Initialisation Pyxel
-        pyxel.init(w, h, title="P25 Hackathon — Pyxel", fps=fps)
+        pyxel.init(w, h, title="P25 Hackathon — Pyxel", fps=self.fps)
         pyxel.run(self.update, self.draw)
+
 
         # Note: pyxel.run ne retourne pas avant la fermeture de la fenêtre.
 
@@ -61,8 +72,16 @@ class PyxelApp:
                 self.frame_counter = 0  # Reset
                 if not self.sim.should_stop():
                     self.sim.step()
+                    self._record_stats()
                 else:
                     self.paused = True
+
+    def _record_stats(self) -> None:
+        s, w, g = self.sim.grid.count()
+        self.stats["turns"].append(self.sim.turn)
+        self.stats["sheep"].append(s)
+        self.stats["wolves"].append(w)
+        self.stats["grass"].append(g)
 
 
     def draw(self) -> None:
@@ -120,7 +139,15 @@ class PyxelApp:
         pyxel.text(2, y + 8, line2, 6)
 
 
-def run_pyxel(cfg: SimConfig, seed: Optional[int], cell_size: int = 8, fps: int = 30) -> int:
+def run_pyxel(cfg: SimConfig, seed: Optional[int], cell_size: int = 8, fps: int = 30) -> dict[str, list[Any]]:
     """Point d'entrée Pyxel (semblable à run_pygame)."""
-    PyxelApp(cfg=cfg, seed=seed, cell_px=cell_size, fps=fps)
-    return 0
+    app = PyxelApp(cfg=cfg, seed=seed, cell_px=cell_size, fps=fps)
+    try:
+        print("DEBUG: Lancement de Pyxel...")
+        app.start()
+        print("DEBUG: Fin de app.start() (normal).")
+    except SystemExit:
+        print("DEBUG: Interception de SystemExit (Pyxel a quitté).")
+        pass
+    print(f"DEBUG: Retour des stats ({len(app.stats['turns'])} tours).")
+    return app.stats

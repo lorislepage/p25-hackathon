@@ -10,6 +10,39 @@ import matplotlib.pyplot as plt
 from p25_hackathon.grid import Grid
 from p25_hackathon.simulation import Simulation, SimConfig
 from p25_hackathon.interface import run_pyxel
+from typing import Any
+
+def plot_stats(stats: dict[str, list[Any]]) -> None:
+    """Affiche le graphique d'évolution des populations."""
+    count = len(stats["turns"])
+    print(f"Génération du graphique d'évolution des populations ({count} points de données)...")
+    
+    if count == 0:
+        print("Attention: Aucune donnée à afficher.")
+        return
+
+    try:
+        plt.figure(figsize=(10, 6))
+        plt.plot(stats["turns"], stats["sheep"], label="Moutons", color="blue")
+        plt.plot(stats["turns"], stats["wolves"], label="Loups", color="red")
+        plt.plot(stats["turns"], stats["grass"], label="Herbe", color="green")
+        
+        plt.xlabel("Tours")
+        plt.ylabel("Population")
+        plt.title("Évolution des populations au cours du temps")
+        plt.legend()
+        plt.grid(True)
+        
+        # Save to file first
+        filename = "evolution.png"
+        plt.savefig(filename)
+        print(f"Graphique sauvegardé dans '{filename}'.")
+
+        # Then show
+        print("Tentative d'affichage du graphique...")
+        plt.show()
+    except Exception as e:
+        print(f"Erreur lors de l'affichage du graphique: {e}")
 
 def build_parser() -> argparse.ArgumentParser:
     """
@@ -32,8 +65,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Couverture initiale d'herbe [0..1] (défaut: 0.30)")
     parser.add_argument("--turns", type=int, default=500,
                         help="Nombre maximum de tours (défaut: 500)")
-    parser.add_argument("--delay", type=float, default=0.05,
-                        help="Délai entre tours en secondes (défaut: 0.05)")
+    parser.add_argument("--delay", type=float, default=0.10,
+                        help="Délai entre tours en secondes (défaut: 0.10)")
     parser.add_argument("--seed", type=int, default=None,
                         help="Graine RNG pour rendre la simulation reproductible")
     parser.add_argument("--no-color", action="store_true",
@@ -76,7 +109,9 @@ def main() -> int:
     )
 
     if args.pyxel:
-        return run_pyxel(cfg, seed=args.seed, cell_size=args.cell_size, fps=args.fps)
+        stats = run_pyxel(cfg, seed=args.seed, cell_size=args.cell_size, fps=args.fps)
+        plot_stats(stats)
+        return 0
 
     # Création de la simulation avec une graine aléatoire optionnelle
     sim = Simulation(cfg, seed=args.seed)
@@ -127,18 +162,7 @@ def main() -> int:
         print("\nArrêt manuel (Ctrl+C).")
 
     # Affichage du graphique d'évolution
-    print("Génération du graphique d'évolution des populations...")
-    plt.figure(figsize=(10, 6))
-    plt.plot(stats["turns"], stats["sheep"], label="Moutons", color="blue")
-    plt.plot(stats["turns"], stats["wolves"], label="Loups", color="red")
-    plt.plot(stats["turns"], stats["grass"], label="Herbe", color="green")
-    
-    plt.xlabel("Tours")
-    plt.ylabel("Population")
-    plt.title("Évolution des populations au cours du temps")
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    plot_stats(stats)
 
     return 0
 
