@@ -4,6 +4,8 @@
 import argparse
 import sys
 import time
+import matplotlib.pyplot as plt
+
 
 from p25_hackathon.grid import Grid
 from p25_hackathon.simulation import Simulation, SimConfig
@@ -80,6 +82,15 @@ def main() -> int:
     sim = Simulation(cfg, seed=args.seed)
     sim.initialize()
 
+    # Dictionnaire pour stocker les données de population
+    stats = {
+        "turns": [],
+        "sheep": [],
+        "wolves": [],
+        "grass": []
+    }
+
+
     try:
         # Boucle principale de la simulation
         while True:
@@ -89,6 +100,13 @@ def main() -> int:
             # Comptage des entités pour affichage synthétique
             s, w, g = sim.grid.count()
             print(f"Tour: {sim.turn} | Sheep: {s} | Wolves: {w} | Grass: {g}")
+
+            # Enregistrement des données
+            stats["turns"].append(sim.turn)
+            stats["sheep"].append(s)
+            stats["wolves"].append(w)
+            stats["grass"].append(g)
+
 
             # Affichage ASCII de la grille
             print(sim.grid.render_ascii(use_color=cfg.use_color))
@@ -108,7 +126,22 @@ def main() -> int:
         # Arrêt propre si l'utilisateur interrompt le programme
         print("\nArrêt manuel (Ctrl+C).")
 
+    # Affichage du graphique d'évolution
+    print("Génération du graphique d'évolution des populations...")
+    plt.figure(figsize=(10, 6))
+    plt.plot(stats["turns"], stats["sheep"], label="Moutons", color="blue")
+    plt.plot(stats["turns"], stats["wolves"], label="Loups", color="red")
+    plt.plot(stats["turns"], stats["grass"], label="Herbe", color="green")
+    
+    plt.xlabel("Tours")
+    plt.ylabel("Population")
+    plt.title("Évolution des populations au cours du temps")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

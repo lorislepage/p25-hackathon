@@ -7,7 +7,7 @@ authors = [
     { name = "Loris Lepage", email = "lepage.loris@icloud.com" }
 ]
 requires-python = ">=3.13"
-dependencies = ["pyxel"]
+dependencies = ["pyxel", "matplotlib"]
 
 [project.scripts]
 p25-hackathon = "p25_hackathon.main:main"
