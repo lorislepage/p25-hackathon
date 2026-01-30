@@ -110,8 +110,9 @@ uv pip install pyxel
 
 **Lancement**
 
-Pour obtenir l'interface en ligne de commande et le tracé de l'évolution des populations : uv run p25-hackathon-cli
-Pour obtenir l'interface graphique via la bibliothèque pyxel : uv run p25-hackathon-cli --pyxel
+Il faut se placer **dans le dossier p25-hackathon**, donc : cd p25-hackathon, avant d'exécuter les lignes suivantes.
+Pour obtenir **l'interface en ligne de commande** et le tracé de l'évolution des populations : uv run p25-hackathon-cli
+Pour obtenir **l'interface graphique** via la bibliothèque pyxel : uv run p25-hackathon-cli --pyxel
 
 ⸻
 
