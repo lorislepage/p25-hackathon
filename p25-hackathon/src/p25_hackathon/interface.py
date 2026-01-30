@@ -1,4 +1,5 @@
 import pyxel
+from typing import Optional
 
 from p25_hackathon.simulation import SimConfig, Simulation
 
@@ -6,11 +7,16 @@ from p25_hackathon.simulation import SimConfig, Simulation
 class PyxelApp:
     """Interface Pyxel pour afficher et piloter la simulation."""
 
-    def _init_(self, cfg: SimConfig, seed: int | None, cell_px: int, fps: int) -> None:
+    def __init__(self, cfg: SimConfig, seed: Optional[int], cell_px: int, fps: int) -> None:
         self.cfg = cfg
         self.seed = seed
         self.cell_px = cell_px
         self.hud_h = 16  # hauteur bandeau texte
+        self.fps = fps
+        self.frame_counter = 0
+        # Convert delay (seconds) to frames. Ensure at least 1 frame wait.
+        self.update_interval = max(1, int(fps * cfg.delay_s))
+
 
         self.sim = Simulation(cfg, seed=seed)
         self.sim.initialize()
@@ -49,10 +55,15 @@ class PyxelApp:
 
         # Simulation
         if (not self.paused) or step_once:
-            if not self.sim.should_stop():
-                self.sim.step()
-            else:
-                self.paused = True
+            # Control speed: update only if step_once (manual) OR enough frames passed
+            self.frame_counter += 1
+            if step_once or (self.frame_counter >= self.update_interval):
+                self.frame_counter = 0  # Reset
+                if not self.sim.should_stop():
+                    self.sim.step()
+                else:
+                    self.paused = True
+
 
     def draw(self) -> None:
         # Fond
@@ -75,9 +86,10 @@ class PyxelApp:
                 # Couleurs Pyxel (0..15). Choix simples:
                 # 0=black, 3=green, 7=white, 8=red, 1=darkblue/dark
                 if cell.grass.present:
-                    base = 3   # herbe
+                    base = 3   # herbe (vert)
                 else:
-                    base = 1   # vide (sombre)
+                    base = 4   # vide (marron, requested by user)
+
 
                 px = x * s
                 py_ = y * s
@@ -88,9 +100,10 @@ class PyxelApp:
                 # Animal par-dessus (rectangle plus petit)
                 a = cell.animal
                 if isinstance(a, Sheep):
-                    pyxel.rect(px + s // 4, py_ + s // 4, s // 2, s // 2, 7)
+                    pyxel.rect(px + s // 4, py_ + s // 4, s // 2, s // 2, 7) # Sheep: White
                 elif isinstance(a, Wolf):
-                    pyxel.rect(px + s // 4, py_ + s // 4, s // 2, s // 2, 8)
+                    pyxel.rect(px + s // 4, py_ + s // 4, s // 2, s // 2, 0) # Wolf: Black
+
 
     def _draw_hud(self) -> None:
         sheep, wolves, grass = self.sim.grid.count()
@@ -107,7 +120,7 @@ class PyxelApp:
         pyxel.text(2, y + 8, line2, 6)
 
 
-def run_pyxel(cfg: SimConfig, seed: int | None, cell_px: int = 8, fps: int = 30) -> int:
+def run_pyxel(cfg: SimConfig, seed: Optional[int], cell_size: int = 8, fps: int = 30) -> int:
     """Point d'entrée Pyxel (semblable à run_pygame)."""
-    PyxelApp(cfg=cfg, seed=seed, cell_px=cell_px, fps=fps)
+    PyxelApp(cfg=cfg, seed=seed, cell_px=cell_size, fps=fps)
     return 0
