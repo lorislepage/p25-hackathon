@@ -75,7 +75,7 @@ class Simulation:
         """Exécute un tour complet."""
         self._turn += 1
 
-        # 1) Vieillir
+        # 1) Incrémentation de l'âge de tous les animaux 
         self._increment_ages()
 
         # 2) Mise à jour de l'herbe
@@ -87,7 +87,7 @@ class Simulation:
         # 4) Phase loups
         self._wolf_phase()
 
-        # 5) Mort (énergie / âge)
+        # 5) vérification des morts
         self._remove_dead()
 
         # 6) Reproduction
