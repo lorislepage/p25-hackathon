@@ -7,6 +7,7 @@ import time
 
 from p25_hackathon.grid import Grid
 from p25_hackathon.simulation import Simulation, SimConfig
+from p25_hackathon.interface import run_pyxel
 
 def build_parser() -> argparse.ArgumentParser:
     """
@@ -37,7 +38,12 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Désactiver les couleurs ANSI")
     parser.add_argument("-v", action="count", default=0,
                         help="Verbose (ex: -v, -vv)")
-
+    parser.add_argument("--pyxel", action="store_true",
+                        help="Lancer l'interface graphique")
+    parser.add_argument("--cell-size", type=int, default=8,
+                        help="Taille des cellules dans l'interface graphique (défaut: 8)")
+    parser.add_argument("--fps", type=int, default=60,
+                        help="Nombre d'images par seconde dans l'interface graphique (défaut: 60)")
     return parser
 
 def clear_screen() -> None:
@@ -66,6 +72,9 @@ def main() -> int:
         delay_s=args.delay,
         use_color=not args.no_color,
     )
+
+    if args.pyxel:
+        return run_pyxel(cfg, seed=args.seed, cell_size=args.cell_size, fps=args.fps)
 
     # Création de la simulation avec une graine aléatoire optionnelle
     sim = Simulation(cfg, seed=args.seed)
