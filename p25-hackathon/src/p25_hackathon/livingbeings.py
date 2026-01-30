@@ -4,8 +4,12 @@ from dataclasses import dataclass
 class Animal:
     """
     Classe de base pour les animaux.
-    La position est gérée par la grille (Grid), ici on garde seulement l'état.
+    Position gérée par la grille (Grid)
+    On ne garde que l'état (âge et énergie)
     """
+
+    #on attribue des valeurs initiales pour l'énergie et l'âge des animaux
+
     energy: int
     age: int = 0
 
@@ -28,19 +32,21 @@ class Wolf(Animal):
 @dataclass
 class GrassCell:
     """
-    État de l'herbe pour une cellule.
-    present : herbe disponible
+    État de l'herbe pour une cellule
+    present : herbe disponible ou non
     regrow_timer : si l'herbe a été mangée, compteur avant repousse
     """
     present: bool
     regrow_timer: int = 0
 
+#timer de repousse de l'herbe
     def tick(self) -> None: 
         if self.regrow_timer > 0:
             self.regrow_timer -= 1
             if self.regrow_timer == 0:
                 self.present = True
 
+#réinitialisation du timer de l'herbe après qu'elle a été mangée
     def eat(self, regrow_time: int) -> None:
         self.present = False
         self.regrow_timer = regrow_time
