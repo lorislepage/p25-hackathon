@@ -1,5 +1,6 @@
 import random
 from dataclasses import dataclass
+from typing import Optional
 
 from p25_hackathon.livingbeings import Sheep, Wolf
 from p25_hackathon.grid import Grid
@@ -42,7 +43,7 @@ class Simulation:
     - Les mouvements échouent si la destination est occupée.
     """
 
-    def _init_(self, config: SimConfig, seed: int | None) -> None:
+    def __init__(self, config: SimConfig, seed: Optional[int]) -> None:
         self._cfg = config
         self._rng = random.Random(seed)
         self._grid = Grid(size=config.grid_size, grass_regrow_time=config.grass_regrowth_time)
@@ -207,7 +208,7 @@ class Simulation:
         self._rng.shuffle(positions)
         return positions
 
-    def _pick_adjacent_free(self, x: int, y: int) -> tuple[int, int] | None:
+    def _pick_adjacent_free(self, x: int, y: int) -> Optional[tuple[int, int]]:
         options = [
             (nx, ny)
             for (nx, ny) in self._grid.neighbors4(x, y)
@@ -217,7 +218,7 @@ class Simulation:
             return None
         return self._rng.choice(options)
 
-    def _pick_adjacent_grass(self, x: int, y: int) -> tuple[int, int] | None:
+    def _pick_adjacent_grass(self, x: int, y: int) -> Optional[tuple[int, int]]:
         options = [
             (nx, ny)
             for (nx, ny) in self._grid.neighbors4(x, y)
@@ -227,7 +228,7 @@ class Simulation:
             return None
         return self._rng.choice(options)
 
-    def _pick_adjacent_sheep(self, x: int, y: int) -> tuple[int, int] | None:
+    def _pick_adjacent_sheep(self, x: int, y: int) -> Optional[tuple[int, int]]:
         options = [
             (nx, ny)
             for (nx, ny) in self._grid.neighbors4(x, y)

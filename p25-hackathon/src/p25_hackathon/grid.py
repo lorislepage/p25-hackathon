@@ -1,33 +1,30 @@
 import random
 from dataclasses import dataclass
+from typing import Optional
 
-from ecosystem.entities import GrassCell, Sheep, Wolf, Animal
-
+from p25_hackathon.livingbeings import GrassCell, Sheep, Wolf, Animal
 
 @dataclass
 class Cell:
     grass: GrassCell
-    animal: Animal | None = None
-
+    animal: Optional[Animal] = None
 
 class Grid:
 
-    def _init_(self, size: int, grass_regrow_time: int) -> None:
+    def __init__(self, size: int, grass_regrow_time: int) -> None:
         if size <= 0:
             raise ValueError("la taille doit être > 0")
         if grass_regrow_time <= 0:
-            raise ValueError("la repouse doit être >0 > 0")
+            raise ValueError("la repousse doit être > 0")
 
         self._size = size
         self._grass_regrow_time = grass_regrow_time
         
         self._cells: list[list[Cell]] = [
-
             [
                Cell(grass=GrassCell(present=False)) for i in range(size)
-                ]
+            ]
             for i in range(size)
-
         ]
 
     @property
@@ -41,19 +38,12 @@ class Grid:
         candidats = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
         l=[]
         for (i,j) in candidats:
-            if self.in_bounds(i,j)==True:
+            if self.in_bounds(i,j):
                 l.append((i,j))
         return l
 
     def cell(self, x: int, y: int) -> Cell:
         return self._cells[y][x]
-
-
-
-
-
-
-
 
     def place_grass_random(self, coverage: float, rng: random.Random) -> None:
 
@@ -62,7 +52,6 @@ class Grid:
                 if rng.random() < coverage:
                     self.cell(x, y).grass.present = True
 
-
     def spawn_animal_random(self, animal: Animal, rng: random.Random) -> bool:
         positionslibres=[]
         for y in range(self._size):
@@ -70,14 +59,12 @@ class Grid:
                 if self.cell(x,y).animal is None:
                     positionslibres.append((x,y))
         
-        if len(positionslibres)==0:
+        if not positionslibres:
             return False
 
         x, y = rng.choice(positionslibres)
         self.cell(x, y).animal = animal
         return True
-
-
 
     def positions_of(self, kind: type[Animal]) -> list[tuple[int, int]]:
         l: list[tuple[int, int]] = []
@@ -87,8 +74,6 @@ class Grid:
                 if isinstance(a,kind):
                     l.append((x, y))
         return l
-
-
 
     def tick_grass(self, grass_growth_probability: float, rng: random.Random) -> None:
 
@@ -104,12 +89,10 @@ class Grid:
                     if rng.random() < grass_growth_probability:
                         c.grass.present = True
 
-
-
     def move_animal(self, dep: tuple[int, int], arr: tuple[int, int]) -> bool:
         fx, fy = dep
         tx, ty = arr
-        if  (self.in_bounds(fx, fy) and self.in_bounds(tx, ty))==False:
+        if not (self.in_bounds(fx, fy) and self.in_bounds(tx, ty)):
             return False
 
         source = self.cell(fx, fy)
@@ -124,28 +107,22 @@ class Grid:
         source.animal = None
         return True
 
-
-
     def remove_animal(self, x: int, y: int) -> None:
         self.cell(x, y).animal = None
-
-
 
     def try_reproduce(self, parent: tuple[int, int], baby: Animal, rng: random.Random) -> bool:
         x, y = parent
         options=[]
         for (i,j) in self.neighbors4(x,y):
             if self.cell(i,j).animal is None:
-                options.append(i,j)
+                options.append((i,j))
         
-        if options==[]:
+        if not options:
             return False
 
         bx, by = rng.choice(options)
         self.cell(bx, by).animal = baby
         return True
-
-
 
     def eat_grass_if_present(self, x: int, y: int) -> bool:
         c = self.cell(x, y)
@@ -153,8 +130,6 @@ class Grid:
             c.grass.eat(regrow_time=self._grass_regrow_time)
             return True
         return False
-
-
 
     def render_ascii(self, use_color: bool) -> str:
         lignes: list[str] = []
@@ -174,9 +149,6 @@ class Grid:
             lignes.append("".join(row_chars))
         return "\n".join(lignes)
 
-
-
-
     def count(self) -> tuple[int, int, int]:
         sheep = 0
         wolf = 0
@@ -195,8 +167,6 @@ class Grid:
                     wolf += 1
 
         return sheep, wolf, grass
-
-
 
     def _colorize(self, ch: str, use_color: bool) -> str:
         if not use_color:
