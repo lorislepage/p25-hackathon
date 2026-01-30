@@ -11,7 +11,7 @@ dependencies = []
 
 [project.scripts]
 p25-hackathon = "p25_hackathon.main:main"
-p25-hackathon-entities = "p25_hackathon.entities:main"
+p25-hackathon-livingbeings = "p25_hackathon.livingbeings:main"
 p25-hackathon-grid = "p25_hackathon.grid:main"
 p25-hackathon-simulation = "p25_hackathon.simulation:main"
 p25-hackathon-cli = "p25_hackathon.cli:main"
