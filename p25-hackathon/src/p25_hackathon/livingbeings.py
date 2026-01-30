@@ -38,14 +38,12 @@ class GrassCell:
     present: bool
     regrow_timer: int = 0
 
-    def tick(self) -> None:
-        # Fait avancer la repousse d'un tour
+    def tick(self) -> None: 
         if self.regrow_timer > 0:
             self.regrow_timer -= 1
             if self.regrow_timer == 0:
                 self.present = True
 
     def eat(self, regrow_time: int) -> None:
-        # L'herbe disparaît, et on lance un timer de repousse
         self.present = False
         self.regrow_timer = regrow_time
