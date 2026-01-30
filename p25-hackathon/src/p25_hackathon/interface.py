@@ -48,6 +48,7 @@ class PyxelApp:
     def update(self) -> None:
         # Quitter
         if pyxel.btnp(pyxel.KEY_ESCAPE):
+            print("DEBUG: Touche ESC détectée. Appel de pyxel.quit()...")
             pyxel.quit()
 
         # Pause / step / reset
@@ -148,6 +149,10 @@ def run_pyxel(cfg: SimConfig, seed: Optional[int], cell_size: int = 8, fps: int 
         print("DEBUG: Fin de app.start() (normal).")
     except SystemExit:
         print("DEBUG: Interception de SystemExit (Pyxel a quitté).")
-        pass
-    print(f"DEBUG: Retour des stats ({len(app.stats['turns'])} tours).")
-    return app.stats
+    except KeyboardInterrupt:
+        print("DEBUG: Interception de KeyboardInterrupt (Ctrl+C).")
+    except Exception as e:
+        print(f"DEBUG: Exception inattendue : {e}")
+    finally:
+        print(f"DEBUG: Retour des stats ({len(app.stats['turns'])} tours).")
+        return app.stats
